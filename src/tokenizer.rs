@@ -1,10 +1,10 @@
 use std::fs;
 
-const KEYWORDS: [&str; 1] = [
+pub const KEYWORDS: [&str; 1] = [
     "return"
 ];
 
-const TYPES: [&str; 1] = [
+pub const TYPES: [&str; 1] = [
     "int"
 ];
 
@@ -75,7 +75,7 @@ pub fn generate_tokens(file: &str) -> Vec<Token> {
 
 fn _flush(chars: &mut String, tokens: &mut Vec<Token>) {
     if !chars.is_empty() {
-        if let Ok(_) = chars.parse::<u128>() {
+        if let Ok(_) = chars.parse::<u8>() {
             tokens.push(Token::new(TokenType::Constant, chars));
         } else if TYPES.contains(&&chars[..]) {
             tokens.push(Token::new(TokenType::Decl, chars));
