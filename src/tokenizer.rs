@@ -14,10 +14,10 @@ pub struct Token {
 }
 
 impl Token {
-    pub fn new(token_type: TokenType, value: String) -> Token {
+    pub fn new(token_type: TokenType, value: &str) -> Token {
         Token {
             token_type,
-            value,
+            value: value.to_string(),
         }
     }
 }
@@ -45,23 +45,23 @@ pub fn generate_tokens(file: &str) -> Vec<Token> {
                 ' ' => _flush(&mut char_buffer, &mut tokens),
                 '(' => {
                     _flush(&mut char_buffer, &mut tokens);
-                    tokens.push(Token::new(TokenType::Paren, "(".to_string()));
+                    tokens.push(Token::new(TokenType::Paren, "("));
                 },
                 ')' => {
                     _flush(&mut char_buffer, &mut tokens);
-                    tokens.push(Token::new(TokenType::Paren, ")".to_string()));
+                    tokens.push(Token::new(TokenType::Paren, ")"));
                 },
                 '{' => {
                     _flush(&mut char_buffer, &mut tokens);
-                    tokens.push(Token::new(TokenType::Brace, "{".to_string()));
+                    tokens.push(Token::new(TokenType::Brace, "{"));
                 },
                 '}' => {
                     _flush(&mut char_buffer, &mut tokens);
-                    tokens.push(Token::new(TokenType::Brace, "}".to_string()));
+                    tokens.push(Token::new(TokenType::Brace, "}"));
                 },
                 ';' => {
                     _flush(&mut char_buffer, &mut tokens);
-                    tokens.push(Token::new(TokenType::Semicolon, ";".to_string()));
+                    tokens.push(Token::new(TokenType::Semicolon, ";"));
                 }
                 _ =>  {
                     char_buffer.push(ch);
@@ -76,13 +76,13 @@ pub fn generate_tokens(file: &str) -> Vec<Token> {
 fn _flush(chars: &mut String, tokens: &mut Vec<Token>) {
     if !chars.is_empty() {
         if let Ok(_) = chars.parse::<u128>() {
-            tokens.push(Token::new(TokenType::Constant, chars.to_string()));
+            tokens.push(Token::new(TokenType::Constant, chars));
         } else if TYPES.contains(&&chars[..]) {
-            tokens.push(Token::new(TokenType::Decl, chars.to_string()));
+            tokens.push(Token::new(TokenType::Decl, chars));
         } else if KEYWORDS.contains(&&chars[..]) {
-            tokens.push(Token::new(TokenType::Keyword, chars.to_string()));
+            tokens.push(Token::new(TokenType::Keyword, chars));
         } else {
-            tokens.push(Token::new(TokenType::Identifier, chars.to_string()));
+            tokens.push(Token::new(TokenType::Identifier, chars));
         }
         chars.clear();
     }
