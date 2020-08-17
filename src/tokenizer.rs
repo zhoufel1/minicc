@@ -52,36 +52,49 @@ pub fn generate_tokens(file: &str) -> Vec<Token> {
     let contents = fs::read_to_string(file).expect("Failed to read file");
 
     for line in contents.lines() {
-        for word in line.trim().trim_end_matches(';').split(" ") {
-            let word = word.to_string();
+        let mut char_buffer = String::new();
 
-            if word == "{" || word == "}" {
-                // Check brace
-                tokens.push(Token::new(TokenType::Brace, word));
-            } else if word == "return" {
-                // Check Return keywordk (refactor later)
-                tokens.push(Token::new(TokenType::Keyword, word));
-            } else if word.contains("(") && word.contains(")") {
-                // Check function name and paren (refactor)
-                let open_pos = word.find("(").unwrap();
-                let close_pos = word.find(")").unwrap();
-
-                if open_pos < close_pos && open_pos != 0 && close_pos == word.len() - 1 {
-                    tokens.push(Token::new(TokenType::Identifier, word[..open_pos].to_string()));
+        for ch in line.trim().chars() {
+            match ch {
+                ' ' => _flush(&mut char_buffer, &mut tokens),
+                '(' => {
+                    _flush(&mut char_buffer, &mut tokens);
                     tokens.push(Token::new(TokenType::Parenthesis, "(".to_string()));
+                },
+                ')' => {
+                    _flush(&mut char_buffer, &mut tokens);
                     tokens.push(Token::new(TokenType::Parenthesis, ")".to_string()));
+                },
+                '{' => {
+                    _flush(&mut char_buffer, &mut tokens);
+                    tokens.push(Token::new(TokenType::Brace, "{".to_string()));
+                },
+                '}' => {
+                    _flush(&mut char_buffer, &mut tokens);
+                    tokens.push(Token::new(TokenType::Brace, "}".to_string()));
+                },
+                ';' => {
+                    _flush(&mut char_buffer, &mut tokens);
+                    tokens.push(Token::new(TokenType::Semicolon, ";".to_string()));
                 }
-            }  else if let Ok(_) = word.parse::<u128>() {
-                // Check numeric literal (int)
-                tokens.push(Token::new(TokenType::Literal, word));
-            } else if word != "" && word.chars().all(|c| ASCII_LOWER.contains(&c) || ASCII_UPPER.contains(&c) || ASCII_NUMERIC.contains(&c)) {
-                // Check for identifier
-                tokens.push(Token::new(TokenType::Identifier, word));
-            }
+                _ =>  {
+                    char_buffer.push(ch);
+                }
+            };
         }
-        if line.contains(";") {
-            tokens.push(Token::new(TokenType::Semicolon, ";".to_string()));
-        }
+        _flush(&mut char_buffer, &mut tokens);
     }
+
     tokens
+}
+
+fn _flush(chars: &mut String, tokens: &mut Vec<Token>) {
+    if !chars.is_empty() {
+        if let Ok(_) = chars.parse::<u128>() {
+            tokens.push(Token::new(TokenType::Literal, chars.to_string()));
+        } else {
+            tokens.push(Token::new(TokenType::Identifier, chars.to_string()));
+        }
+        chars.clear();
+    }
 }
