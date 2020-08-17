@@ -29,24 +29,24 @@ pub fn parse_function(tokens: &[Token]) -> Option<Function> {
     let mut next = tok.next().unwrap();
     match next.token_type {
         TokenType::Decl => (),
-        _ => panic!(),
+        _ => panic!("Missing type declaration"),
     }
     next = tok.next().unwrap();
     let name = match next.token_type {
         TokenType::Identifier => next.value.to_string(),
-        _ => panic!(),
+        _ => panic!("Missing function identifier"),
     };
     next = tok.next().unwrap();
     if next.value != "(" {
-        panic!();
+        panic!("Mismatch parenthesis");
     }
     next = tok.next().unwrap();
     if next.value != ")" {
-        panic!();
+        panic!("Mismatch parenthesis");
     }
     next = tok.next().unwrap();
     if next.value != "{" {
-        panic!();
+        panic!("Mismatch brace");
     }
     let statement = parse_statement(&tokens[5..]).unwrap();
     let func = Function {
@@ -55,7 +55,7 @@ pub fn parse_function(tokens: &[Token]) -> Option<Function> {
     };
     next = tok.last().unwrap();
     if next.value != "}" {
-        panic!();
+        panic!("Mismatch brace");
     }
     Some(func)
 }
@@ -64,19 +64,19 @@ pub fn parse_statement(tokens: &[Token]) -> Option<Return> {
     let mut tok = tokens.iter();
     let mut next = tok.next().unwrap();
     if next.value != "return" {
-        panic!();
+        panic!("Missing return value");
     }
     next = tok.next().unwrap();
     match next.token_type {
         TokenType::Constant => (),
-        _ => panic!(),
+        _ => panic!("Invalid syntax after return"),
     }
     let expr = parse_expr(&tokens[1..]).unwrap();
     let statement = Return { return_value: expr };
     next = tok.next().unwrap();
     match next.token_type {
         TokenType::Semicolon => (),
-        _ => panic!(),
+        _ => panic!("Missing semicolon"),
     }
     Some(statement)
 }
