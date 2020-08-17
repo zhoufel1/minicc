@@ -1,7 +1,8 @@
 # minicc Compiler 
 
 ## Goal 
-Create a c compiler with essential features + parser. Learn about parsers, compilers, and assembly.
+Create a c compiler which supports the essential features of the language. Use x86-64 assembly.
+Learn about lexers, parsers, compilers, assembly, low level systems programming. Practice rust.
 
 ## Resources 
 * https://norasandler.com/2017/11/29/Write-a-Compiler.html#fn1
@@ -10,5 +11,10 @@ Create a c compiler with essential features + parser. Learn about parsers, compi
 
 ## TODO 
 
-## Information 
+## Info 
+
+### Compilers
 * Source code -> (lexer) -> token stream -> (praser) -> AST -> (Compiler) -> binary.
+
+### Assembly 
+* 
