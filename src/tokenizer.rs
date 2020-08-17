@@ -18,6 +18,11 @@ const ASCII_UPPER: [char; 26] = [
     'Z'
 ];
 
+const ASCII_NUMERIC: [char; 10] = [
+    '0', '1', '2', '3', '4',
+    '5', '6', '7', '8', '9',
+];
+
 pub struct Token {
     pub token_type: TokenType,
     pub content: String,
@@ -53,7 +58,7 @@ pub fn generate_tokens(file: &str) -> Vec<Token> {
             if word == "{" || word == "}" {
                 // Check brace
                 tokens.push(Token::new(TokenType::Brace, word));
-            } else if word == "Return" {
+            } else if word == "return" {
                 // Check Return keywordk (refactor later)
                 tokens.push(Token::new(TokenType::Keyword, word));
             } else if word.contains("(") && word.contains(")") {
@@ -66,12 +71,12 @@ pub fn generate_tokens(file: &str) -> Vec<Token> {
                     tokens.push(Token::new(TokenType::Parenthesis, "(".to_string()));
                     tokens.push(Token::new(TokenType::Parenthesis, ")".to_string()));
                 }
-            } else if word.chars().all(|c| ASCII_LOWER.contains(&c) || ASCII_UPPER.contains(&c)) {
-                // Check for identifier
-                tokens.push(Token::new(TokenType::Identifier, word));
             }  else if let Ok(_) = word.parse::<u128>() {
                 // Check numeric literal (int)
                 tokens.push(Token::new(TokenType::Literal, word));
+            } else if word != "" && word.chars().all(|c| ASCII_LOWER.contains(&c) || ASCII_UPPER.contains(&c) || ASCII_NUMERIC.contains(&c)) {
+                // Check for identifier
+                tokens.push(Token::new(TokenType::Identifier, word));
             }
         }
         if line.contains(";") {
