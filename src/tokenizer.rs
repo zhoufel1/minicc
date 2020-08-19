@@ -35,7 +35,8 @@ pub enum TokenType {
 
 pub fn generate_tokens(file: &str) -> Vec<Token> {
     let mut tokens = Vec::new();
-    let contents = fs::read_to_string(file).expect("Failed to read file");
+    let contents = fs::read_to_string(file)
+        .expect("Failed to read file");
 
     for line in contents.lines() {
         let mut char_buffer = String::new();
