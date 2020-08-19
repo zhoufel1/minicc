@@ -1,4 +1,3 @@
-use std::fs;
 
 pub const KEYWORDS: [&str; 1] = [
     "return"
@@ -6,6 +5,10 @@ pub const KEYWORDS: [&str; 1] = [
 
 pub const TYPES: [&str; 1] = [
     "int"
+];
+
+pub const OPERATORS: [&str; 3] = [
+    "-", "~", "!"
 ];
 
 pub struct Token {
@@ -31,12 +34,11 @@ pub enum TokenType {
     Constant,
     Keyword,
     Decl,
+    Op,
 }
 
-pub fn generate_tokens(file: &str) -> Vec<Token> {
+pub fn generate_tokens(contents: &str) -> Vec<Token> {
     let mut tokens = Vec::new();
-    let contents = fs::read_to_string(file)
-        .expect("Failed to read file");
 
     for line in contents.lines() {
         let mut char_buffer = String::new();
@@ -63,7 +65,19 @@ pub fn generate_tokens(file: &str) -> Vec<Token> {
                 ';' => {
                     _flush(&mut char_buffer, &mut tokens);
                     tokens.push(Token::new(TokenType::Semicolon, ";"));
-                }
+                },
+                '-' =>  {
+                    _flush(&mut char_buffer, &mut tokens);
+                    tokens.push(Token::new(TokenType::Op, "-"));
+                },
+                '~' =>  {
+                    _flush(&mut char_buffer, &mut tokens);
+                    tokens.push(Token::new(TokenType::Op, "~"));
+                },
+                '!' =>  {
+                    _flush(&mut char_buffer, &mut tokens);
+                    tokens.push(Token::new(TokenType::Op, "!"));
+                },
                 _ =>  {
                     char_buffer.push(ch);
                 }
