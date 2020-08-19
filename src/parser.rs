@@ -18,62 +18,63 @@ pub struct Const {
 }
 
 pub fn parse_tokens(tokens: &Vec<Token>) -> Option<Program> {
-    let main = parse_function(&tokens)?;
+    let mut tokens = tokens.iter();
+    let main = parse_function(&mut tokens)?;
     Some(Program {
         main,
     })
 }
 
-pub fn parse_function(tokens: &[Token]) -> Option<Function> {
-    let mut tok = tokens.iter();
-    let mut next = tok.next()?;
+pub fn parse_function<'a, I>(tokens: &mut I) -> Option<Function>
+where
+    I:Iterator<Item = &'a Token>
+{
+    let mut tok = tokens;
+    let mut next = tok.next().unwrap();
     match next.token_type {
         TokenType::Decl => (),
         _ => panic!("Missing type declaration"),
     }
-    next = tok.next()?;
+    next = tok.next().unwrap();
     let name = match next.token_type {
         TokenType::Identifier => next.value.to_string(),
         _ => panic!("Missing function identifier"),
     };
-    next = tok.next()?;
+    next = tok.next().unwrap();
     if next.value != "(" {
         panic!("Mismatch parenthesis");
     }
-    next = tok.next()?;
+    next = tok.next().unwrap();
     if next.value != ")" {
         panic!("Mismatch parenthesis");
     }
-    next = tok.next()?;
+    next = tok.next().unwrap();
     if next.value != "{" {
         panic!("Mismatch brace");
     }
-    let statement = parse_statement(&tokens[5..]).unwrap();
+    let statement = parse_statement(&mut tok).unwrap();
     let func = Function {
         name,
         body: statement,
     };
-    next = tok.last()?;
+    next = tok.next().unwrap();
     if next.value != "}" {
         panic!("Mismatch brace");
     }
     Some(func)
 }
 
-pub fn parse_statement(tokens: &[Token]) -> Option<Return> {
-    let mut tok = tokens.iter();
-    let mut next = tok.next()?;
+pub fn parse_statement<'a, I>(mut tokens: &mut I) -> Option<Return>
+where
+    I:Iterator<Item = &'a Token>
+{
+    let mut next = tokens.next()?;
     if next.value != "return" {
         panic!("Missing return value");
     }
-    next = tok.next()?;
-    match next.token_type {
-        TokenType::Constant => (),
-        _ => panic!("Invalid syntax after return"),
-    }
-    let expr = parse_expr(&tokens[1..])?;
+    let expr = parse_expr(&mut tokens).unwrap();
     let statement = Return { return_value: expr };
-    next = tok.next()?;
+    next = tokens.next()?;
     match next.token_type {
         TokenType::Semicolon => (),
         _ => panic!("Missing semicolon"),
@@ -81,19 +82,18 @@ pub fn parse_statement(tokens: &[Token]) -> Option<Return> {
     Some(statement)
 }
 
-pub fn parse_expr(tokens: &[Token]) -> Option<Const> {
-    if let Some(tok) = tokens.iter().next() {
-        // check if expression is value
-        match tok.token_type {
-            TokenType::Constant => {
-                let expr = Const {
-                    val: tok.value.parse::<u32>().unwrap(),
-                };
-                Some(expr)
-            }
-            _ => None,
-        }
-    } else {
-        None
+pub fn parse_expr<'a, I>(tokens: &mut I) -> Option<Const>
+where
+    I:Iterator<Item = &'a Token>
+{
+    let next = tokens.next()?;
+    match next.token_type {
+        TokenType::Constant => {
+            let expr = Const {
+                val: next.value.parse::<u32>().unwrap(),
+            };
+            return Some(expr)
+        },
+        _ => return None,
     }
 }
