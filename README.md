@@ -1,4 +1,4 @@
-# minicc Compiler
+#minicc Compiler
 
 ## Goal
 Create a c compiler which supports the essential features of the language. Use x86-64 assembly.
@@ -12,6 +12,7 @@ Learn about lexers, parsers, compilers, assembly, low level systems programming.
 * https://en.wikipedia.org/wiki/Recursive_descent_parser
 
 ## TODO
+* Add hex and oct
 
 ## Info
 
