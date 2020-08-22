@@ -1,26 +1,35 @@
 use crate::tokenizer::{Token, TokenType};
 
 pub struct Program {
-    pub main: Function,
+    pub main: Function
 }
 
 pub struct Function {
     pub name: String,
-    pub body: Return,
+    pub body: Return
 }
 
 pub struct Return {
-    pub return_value: Const,
+    pub return_value: Expr
 }
 
-pub struct Const {
-    pub val: u32,
+pub enum Expr {
+    Const { int: Int },
+    Expression { op: UnaryOp, expr: Box<Expr> }
+}
+
+pub struct UnaryOp {
+    pub op: String
+}
+
+pub struct Int {
+    pub val: u32
 }
 
 pub fn parse_tokens(tokens: &Vec<Token>) -> Option<Program> {
     let mut tokens = tokens.iter();
     let program = Program {
-        main: parse_function(&mut tokens)?,
+        main: parse_function(&mut tokens)?
     };
     Some(program)
 }
@@ -33,13 +42,13 @@ where
     let mut tok = tokens.next()?;
     match tok.token_type {
         TokenType::Decl => (),
-        _ => panic!("Missing type declaration"),
+        _ => panic!("Missing type declaration")
     }
 
     tok = tokens.next()?;
     let name = match tok.token_type {
         TokenType::Identifier => tok.value.to_string(),
-        _ => panic!("Missing function identifier"),
+        _ => panic!("Missing function identifier")
     };
 
     if tokens.next()?.value != "(" {
@@ -55,7 +64,7 @@ where
     let body = parse_statement(&mut tokens)?;
     let func = Function {
         name,
-        body,
+        body
     };
 
     if tokens.next()?.value != "}" {
@@ -80,12 +89,12 @@ where
     tok = tokens.next()?;
     match tok.token_type {
         TokenType::Semicolon => (),
-        _ => panic!("Missing semicolon"),
+        _ => panic!("Missing semicolon")
     }
     Some(statement)
 }
 
-pub fn parse_expr<'a, I>(tokens: &mut I) -> Option<Const>
+pub fn parse_expr<'a, I>(tokens: &mut I) -> Option<Expr>
 where
     I:Iterator<Item = &'a Token>
 {
@@ -93,11 +102,23 @@ where
     let tok = tokens.next()?;
     match tok.token_type {
         TokenType::Constant => {
-            let expr = Const {
-                val: tok.value.parse::<u32>().unwrap(),
+            let expr = Expr::Const {
+                int: Int {
+                    val: tok.value.parse::<u32>().unwrap()
+                }
             };
-            return Some(expr)
+            Some(expr)
         },
-        _ => return None,
+        TokenType::Op => {
+            let inner = parse_expr(tokens)?;
+            let expr = Expr::Expression {
+                op: UnaryOp {
+                    op: tok.value.to_string()
+                },
+                expr: Box::new(inner)
+            };
+            Some(expr)
+        }
+        _ => None
     }
 }
