@@ -1,9 +1,7 @@
-pub const KEYWORDS: [&str; 1] = [
-    "return"
-];
+use regex::Regex;
 
-pub const TYPES: [&str; 1] = [
-    "int"
+pub const KEYWORDS: [&str; 2] = [
+    "return", "int"
 ];
 
 pub struct Token {
@@ -26,10 +24,10 @@ pub enum TokenType {
     Paren,
     Semicolon,
     Identifier,
-    Constant,
+    Literal,
     Keyword,
-    Decl,
-    Op
+    Op,
+    Invalid
 }
 
 pub fn generate_tokens(contents: &str) -> Vec<Token> {
@@ -85,15 +83,14 @@ pub fn generate_tokens(contents: &str) -> Vec<Token> {
 
 fn _flush(chars: &mut String, tokens: &mut Vec<Token>) {
     if !chars.is_empty() {
-        if let Ok(_) = chars.parse::<u32>() {
-            tokens.push(Token::new(TokenType::Constant, chars));
-        } else if TYPES.contains(&&chars[..]) {
-            tokens.push(Token::new(TokenType::Decl, chars));
+        if let Some(_) = Regex::new(r"^[0-9]+$").unwrap().captures(&chars) {
+            tokens.push(Token::new(TokenType::Literal, chars))
         } else if KEYWORDS.contains(&&chars[..]) {
             tokens.push(Token::new(TokenType::Keyword, chars));
-        } else {
-            // TODO: This should check if the identifier is valid
+        } else if let Some(_) = Regex::new(r"^[a-zA-z_]\w+$").unwrap().captures(&chars) {
             tokens.push(Token::new(TokenType::Identifier, chars));
+        } else {
+            tokens.push(Token::new(TokenType::Invalid, chars));
         }
         chars.clear();
     }
