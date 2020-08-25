@@ -1,4 +1,4 @@
-#minicc Compiler
+# minicc Compiler
 
 ## Goal
 Create a c compiler which supports the essential features of the language. Use x86-64 assembly.
