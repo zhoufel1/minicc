@@ -1,30 +1,12 @@
 use crate::tokenizer::{Token, TokenType};
-
-pub struct Program {
-    pub main: Function
-}
-
-pub struct Function {
-    pub name: String,
-    pub body: Return
-}
-
-pub struct Return {
-    pub return_value: Expr
-}
-
-pub enum Expr {
-    Const { int: Int },
-    Expression { op: UnaryOp, expr: Box<Expr> }
-}
-
-pub struct UnaryOp {
-    pub op: String
-}
-
-pub struct Int {
-    pub val: u32
-}
+use crate::ast::{
+    Program,
+    Function,
+    Return,
+    Expr,
+    UnaryOp,
+    Int,
+};
 
 pub fn parse_tokens(tokens: &Vec<Token>) -> Option<Program> {
     let mut tokens = tokens.iter();
@@ -41,7 +23,7 @@ where
     // only checks for return statement
     let mut tok = tokens.next()?;
     match tok.token_type {
-        TokenType::Decl => (),
+        TokenType::Literal => (),
         _ => panic!("Missing type declaration")
     }
 
@@ -101,7 +83,7 @@ where
     // only checks for single int expression
     let tok = tokens.next()?;
     match tok.token_type {
-        TokenType::Constant => {
+        TokenType::Literal => {
             let expr = Expr::Const {
                 int: Int {
                     val: tok.value.parse::<u32>().unwrap()

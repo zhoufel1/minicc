@@ -1,4 +1,4 @@
-	.file	"sample.c"
+	.file	"return_const.c"
 	.text
 	.section	.text.startup,"ax",@progbits
 	.p2align 4
@@ -8,5 +8,5 @@ main:
 	movl	$2, %eax
 	ret
 	.size	main, .-main
-	.ident	"GCC: (GNU) 10.1.0"
+	.ident	"GCC: (GNU) 10.2.0"
 	.section	.note.GNU-stack,"",@progbits
