@@ -23,7 +23,7 @@ where
     // only checks for return statement
     let mut tok = tokens.next()?;
     match tok.token_type {
-        TokenType::Literal => (),
+        TokenType::Keyword => (),
         _ => panic!("Missing type declaration")
     }
 
