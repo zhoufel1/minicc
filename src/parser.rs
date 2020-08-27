@@ -93,9 +93,20 @@ where
         },
         TokenType::Op => {
             let inner = parse_expr(tokens)?;
+
+            // Deny decrement operator on literal
+            if tok.value == "-" {
+                if let Expr::Expression { op, .. } = &inner {
+                    if op.val == "-"  {
+                        panic!("Cannot decrement lvalue");
+                    }
+                }
+            }
+
+            // Recursve over unary expressions
             let expr = Expr::Expression {
                 op: UnaryOp {
-                    op: tok.value.to_string()
+                    val: tok.value.to_string()
                 },
                 expr: Box::new(inner)
             };
