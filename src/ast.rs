@@ -17,7 +17,7 @@ pub enum Expr {
 }
 
 pub struct UnaryOp {
-    pub op: String
+    pub val: String
 }
 
 pub struct Int {
