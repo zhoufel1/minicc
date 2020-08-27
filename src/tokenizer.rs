@@ -6,7 +6,7 @@ pub const KEYWORDS: [&str; 2] = [
 
 pub struct Token {
     pub token_type: TokenType,
-    pub value: String
+    pub value: String,
 }
 
 impl Token {
@@ -32,51 +32,44 @@ pub enum TokenType {
 
 pub fn generate_tokens(contents: &str) -> Vec<Token> {
     let mut tokens = Vec::new();
+    let mut line_pos: u32 = 1;
 
     for line in contents.lines() {
         let mut char_buffer = String::new();
+        let mut col_pos = 1;
 
         for ch in line.trim().chars() {
+            let ch_s = &ch.to_string()[..];
             match ch {
                 ' ' => _flush(&mut char_buffer, &mut tokens),
-                '(' => {
+                '('
+                | ')' => {
                     _flush(&mut char_buffer, &mut tokens);
-                    tokens.push(Token::new(TokenType::Paren, "("));
+                    tokens.push(Token::new(TokenType::Paren, ch_s));
                 },
-                ')' => {
+                '{'
+                | '}' => {
                     _flush(&mut char_buffer, &mut tokens);
-                    tokens.push(Token::new(TokenType::Paren, ")"));
-                },
-                '{' => {
-                    _flush(&mut char_buffer, &mut tokens);
-                    tokens.push(Token::new(TokenType::Brace, "{"));
-                },
-                '}' => {
-                    _flush(&mut char_buffer, &mut tokens);
-                    tokens.push(Token::new(TokenType::Brace, "}"));
+                    tokens.push(Token::new(TokenType::Brace, ch_s));
                 },
                 ';' => {
                     _flush(&mut char_buffer, &mut tokens);
-                    tokens.push(Token::new(TokenType::Semicolon, ";"));
+                    tokens.push(Token::new(TokenType::Semicolon, ch_s));
                 },
-                '-' =>  {
+                '-'
+                | '~'
+                | '!' =>  {
                     _flush(&mut char_buffer, &mut tokens);
-                    tokens.push(Token::new(TokenType::Op, "-"));
-                },
-                '~' =>  {
-                    _flush(&mut char_buffer, &mut tokens);
-                    tokens.push(Token::new(TokenType::Op, "~"));
-                },
-                '!' =>  {
-                    _flush(&mut char_buffer, &mut tokens);
-                    tokens.push(Token::new(TokenType::Op, "!"));
+                    tokens.push(Token::new(TokenType::Op, ch_s));
                 },
                 _ =>  {
                     char_buffer.push(ch);
                 }
             };
+            col_pos += 1;
         }
         _flush(&mut char_buffer, &mut tokens);
+        line_pos += 1;
     }
     tokens
 }
