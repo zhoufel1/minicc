@@ -27,15 +27,45 @@ fn generate_function(mut file: &fs::File, tree: &ast::Function) {
 }
 
 fn generate_return(mut file: &fs::File, tree: &ast::Return) {
-    let ret_value = match &tree.return_value {
+    match &tree.return_value {
         ast::Expr::Const { int } => {
-            int.val
+            generate_int(&mut file, &int);
+            writeln!(&mut file, "        ret")
+                .expect("Failed to write to file");
         },
-        _ => panic!("Invalid statement")
-    };
+        ast::Expr::Expression { op, expr } => {
+            match &**expr {
+                ast::Expr::Const { int } => {
+                    generate_unary_op(&mut file, &op, &expr);
+                    writeln!(&mut file, "        ret")
+                        .expect("Failed to write to file");
+                },
+                _ => (), //TODO Recurse
+            }
+        }
+    }
+}
 
-    writeln!(&mut file, "        movl    ${}, %eax", ret_value)
+fn generate_int(mut file: &fs::File, int: &ast::Int) {
+    writeln!(&mut file, "        movl    ${}, %eax", int.val)
         .expect("Failed to write to file");
-    writeln!(&mut file, "        ret")
-        .expect("Failed to write to file");
+}
+
+fn generate_unary_op(mut file: &fs::File, op: &ast::UnaryOp, expr: &ast::Expr) {
+    match expr {
+        ast::Expr::Const { int} => {
+            println!("Exe");
+            generate_int(file, int);
+            match &op.val[..] {
+                "-" => writeln!(&mut file, "        neg     %eax")
+                    .expect("Failed to write to file"),
+                "!" => writeln!(&mut file, "        not     %eax")
+                    .expect("Failed to write to file"),
+                _ => ()
+            }
+        },
+        ast::Expr::Expression { .. } => {
+            ()
+        }
+    }
 }
