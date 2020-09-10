@@ -6,7 +6,7 @@ _main:                                  ## @main
 ## %bb.0:
 	pushq	%rbp
 	movq	%rsp, %rbp
-	movl	$3, %eax
+	movl	$-121, %eax
 	popq	%rbp
 	retq
                                         ## -- End function
